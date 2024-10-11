@@ -26,6 +26,8 @@
 
 
 Cypress.Commands.add('fillMandatoryFieldsAndSubmit', function() {
+    cy.clock()
+
     cy.get('#firstName').type('Mike')
     cy.get('#lastName').type('Baguncinha')
     cy.get('#email').type('mikebaguncinha@email.com')
@@ -33,4 +35,8 @@ Cypress.Commands.add('fillMandatoryFieldsAndSubmit', function() {
     cy.contains('button', 'Enviar').click()
 
     cy.get('.success').should('be.visible')
+
+    cy.tick(3000)
+
+    cy.get('.success').should('not.be.visible')
 })
