@@ -45,13 +45,15 @@ describe('Central de Atendimento ao Cliente TAT', function() {
         cy.get('.error').should('not.be.visible')
     })
 
-    it('campo telefone continua vazio quando preenchido com valor não-numérico', function(){
+    Cypress._.times(3, function() {
+      it('campo telefone continua vazio quando preenchido com valor não-numérico', function(){
         cy.get('#firstName').type('Mike')
         cy.get('#lastName').type('Baguncinha')
         cy.get('#email').type('mikebaguncinha@email.com')
         cy.get('#phone')
           .type('aaaaaaaaaa')
           .should('have.value', '')
+    })
     })
 
     it('exibe mensagem de erro quando o telefone se torna obrigatório, mas não é preenchido', function() {
@@ -183,6 +185,52 @@ describe('Central de Atendimento ao Cliente TAT', function() {
           .click()
 
       cy.contains('Talking About Testing').should('be.visible')
+    })
+
+    it('exibe e esconde as mensagens de sucesso e erro usando o .invoke', () => {
+      cy.get('.success')
+        .should('not.be.visible')
+        .invoke('show')
+        .should('be.visible')
+        .and('contain', 'Mensagem enviada com sucesso.')
+        .invoke('hide')
+        .should('not.be.visible')
+      cy.get('.error')
+        .should('not.be.visible')
+        .invoke('show')
+        .should('be.visible')
+        .and('contain', 'Valide os campos obrigatórios!')
+        .invoke('hide')
+        .should('not.be.visible')
+    })
+
+    it('preenche a área de texto utilizando o comando invoke', function() {
+      const longText = Cypress._.repeat('aaaaaaaaaaaa', 20)
+
+      cy.get('#open-text-area')
+        .invoke('val', longText)
+        .should('have.value', longText)
+    })
+
+    it('faz requisição HTTP', function() {
+      cy.request('https://cac-tat.s3.eu-central-1.amazonaws.com/index.html')
+        .should(function(response) {
+          const {status, statusText, body} = response
+          expect(status).to.equal(200)
+          expect(statusText).to.equal('OK')
+          expect(body).to.include('CAC TAT')
+        })
+    })
+
+    it('encontre o gato', function() {
+      cy.get('#cat')
+        .should('not.be.visible')
+        .invoke('show')
+        .should('be.visible')
+      cy.get('#title')
+        .invoke('text', 'CAT TAT')
+      cy.get('#subtitle')
+        .invoke('text', 'Gatos *----* xD xD xD')
     })
 
 })
